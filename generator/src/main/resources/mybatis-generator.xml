@@ -58,7 +58,7 @@
             <property name="enableSubPackages" value="true" />
             <property name="trimStrings" value="true" />
             <!-- 指定基类：指定基类时，需要在table表中打开需要忽略的列名 -->
-            <property name="rootClass" value="io.daff.base.BaseEntity"/>
+<!--            <property name="rootClass" value="io.daff.base.BaseEntity"/>-->
         </javaModelGenerator>
         <!--
             sqlMapGenerator 生成表对应的sql的xml配置文件
@@ -86,7 +86,7 @@
          -->
         <!-- 单张表，%：映射所有表 -->
         <table tableName="user" domainObjectName="User">
-            <ignoreColumn column="id"/>
+<!--            <ignoreColumn column="id"/>-->
         </table>
     </context>
 </generatorConfiguration>
