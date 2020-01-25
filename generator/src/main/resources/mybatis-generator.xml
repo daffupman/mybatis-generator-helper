@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+    <!--
+            targetRuntime 属性设置生成的代码是什么样的版本
+                MyBatis3Simple 	表示带有单表的简单的增，删，改，查(没有Example类)
+                MyBatis3		表示带有单表的增，删，改，查，之外，还有类似Hiberante 的 QBC复杂查询(有Example类)
+     -->
+    <context id="DB2Tables" targetRuntime="MyBatis3">
+
+        <property name="beginningDelimiter" value="`"/>
+        <property name="endingDelimiter" value="`"/>
+
+        <!-- 整合lombok插件 -->
+        <plugin type="io.daff.mybatis.plugin.LombokPlugin"/>
+        <!-- swagger插件 -->
+        <plugin type="io.daff.mybatis.plugin.SwaggerPlugin"/>
+<!--        <plugin type="tk.mybatis.mapper.generator.MapperPlugin">-->
+<!--            <property name="mappers" value="io.daff.mybatis.base.BaseMapper"/>-->
+<!--        </plugin>-->
+        <!-- 整合序列化插件 -->
+        <plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>
+
+        <!-- 去掉全部的注释 -->
+        <commentGenerator type="io.daff.mybatis.plugin.CommentPlugin">
+            <!-- 是否去除自动生成的注释 true：是；false：否 -->
+            <property name="suppressAllComments" value="false" />
+        </commentGenerator>
+
+        <!--
+            jdbcConnection 为数据库连接的四要素信息。
+            请修改成为你自己的内容
+         -->
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://192.168.35.65:3306/test"
+                        userId="root"
+                        password="root">
+        </jdbcConnection>
+
+        <!--
+            把JDBC DECIMAL 和 NUMERIC 类型解析为 Integer，
+            为 true时把JDBC DECIMAL 和 NUMERIC 类型解析为java.math.BigDecimal
+            默认false
+         -->
+        <javaTypeResolver >
+            <property name="forceBigDecimals" value="false" />
+        </javaTypeResolver>
+
+        <!--
+            javaModelGenerator 生成表对应的javaBean
+            targetPackage 属性设置生成的类的包名
+            targetProject 属性设置生成的工程的路径    一般生成为当前工程。写为 .\
+         -->
+        <javaModelGenerator targetPackage="io.daff.result.entity" targetProject=".\generator\src\main\java">
+            <property name="enableSubPackages" value="true" />
+            <property name="trimStrings" value="true" />
+            <!-- 指定基类：指定基类时，需要在table表中打开需要忽略的列名 -->
+            <property name="rootClass" value="io.daff.base.BaseEntity"/>
+        </javaModelGenerator>
+        <!--
+            sqlMapGenerator 生成表对应的sql的xml配置文件
+            targetPackage 属性设置生成的sql配置文件的包名
+            targetProject 属性设置生成的工程的路径    一般生成为当前工程。写为 .\
+         -->
+        <sqlMapGenerator targetPackage="io.daff.result.xml"  targetProject=".\generator\src\main\java">
+            <property name="enableSubPackages" value="true" />
+        </sqlMapGenerator>
+
+        <!--
+            javaClientGenerator 生成mybatis客户端的代码 ===dao或mapper之类
+            targetPackage 属性设置生成的mybatis的调用代码，比如mapper之类的接口
+            targetProject 属性设置生成的工程的路径    一般生成为当前工程。写为 .\
+         -->
+        <javaClientGenerator type="XMLMAPPER" targetPackage="io.daff.result.mapper"
+                             targetProject=".\generator\src\main\java">
+            <property name="enableSubPackages" value="true" />
+        </javaClientGenerator>
+
+        <!--
+            table 配置哪些表需要我们映射生成java代码
+                tableName 			是表名
+                domainObjectName	是javaBean名
+         -->
+        <!-- 单张表，%：映射所有表 -->
+        <table tableName="user" domainObjectName="User">
+            <ignoreColumn column="id"/>
+        </table>
+    </context>
+</generatorConfiguration>
