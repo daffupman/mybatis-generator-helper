@@ -1,11 +1,11 @@
 # mybatis-generator-helper(mybatis逆向工程助手)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/daffupman/mybatis-generator-helper)
 
-## 简介
+> ## 简介
 
 此项目是基于mybatis的逆向工程封装。mybatis的逆向工程可以帮我们自动生成单表的CRUD，减少一些重复工作，可提高工作效率节约开发时间。在这基础之上，此项目还编写了自定义的插件（lombok、swagger），并提供了注释生成器。
 
-## 目录结构
+> ## 目录结构
 
 此项目由两个模块组成：
 - base-model：该模块可放置一些基础模型，如BaseEntity、BaseMapper等，如果在使用此工具（本项目）时，工作中的项目是有基类的，那么需要将基类复制一份到指定的目录下；否则可无视此模块。
@@ -14,7 +14,7 @@
     - mybatis-generator：逆向工程的配置文件。可做数据库信息配置、插件配置、表生成配置等。这是一个需要关注的地方。
     - plugin：插件包，目前只有整合lombok、swagger，和一个自动生成注释的功能。
     
-## 快速使用
+> ##  快速使用
 
 此项目非常简单，使用起来也很简单。一般在初次使用该项目时，只需要修改 `mybatis-generator.xml` 文件即可。修改的内容包括：
 - 数据库连接信息；
@@ -25,4 +25,14 @@
 另外在需要继承基类的时候，需要额外地多做一些步骤：
 - 将BaseEntity类放到 `base-model` 项目下的 `io.daff.base` 文件下，可使用maven命令或插件将 `base-model` 项目发布到本地仓库；
 - 在 `mybatis-generator.xml` 中的将javaBean的配置下的 `rootClass` 的注释打开；
-- 在 `mybatis-generator.xml` 中的table标签中的 `ignoreColumn` 节点打开。
+- 在 `mybatis-generator.xml` 中的table标签中的 `ignoreColumn` 节点打开，并添加目标类中在基类中已经存储的属性名；
+- 在 `lombok.properties` 文件中将 `hasParent` 修改成 `true`。
+
+> ##  功能
+
+> ### v1.0
+
+- 按需生成entity，mapper接口和mapper映射文件
+- 整合lombok和swagger
+- 可自定义注释模板
+- 可生成继承父类的entity

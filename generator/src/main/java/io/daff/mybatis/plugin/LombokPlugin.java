@@ -1,5 +1,6 @@
 package io.daff.mybatis.plugin;
 
+import io.daff.mybatis.config.LombokConfig;
 import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.PluginAdapter;
@@ -16,6 +17,12 @@ import java.util.List;
  */
 public class LombokPlugin extends PluginAdapter {
 
+    private LombokConfig lombokConfig;
+
+    public LombokPlugin() {
+        lombokConfig = new LombokConfig();
+    }
+
     @Override
     public boolean validate(List<String> list) {
         return true;
@@ -25,17 +32,21 @@ public class LombokPlugin extends PluginAdapter {
     public boolean modelBaseRecordClassGenerated(TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
         // 引入注解相关的包
         topLevelClass.addImportedType("lombok.Data");
-        topLevelClass.addImportedType("lombok.Builder");
-        topLevelClass.addImportedType("lombok.NoArgsConstructor");
-        topLevelClass.addImportedType("lombok.AllArgsConstructor");
-        topLevelClass.addImportedType("lombok.EqualsAndHashCode");
-
-        // 引入相关的注解
         topLevelClass.addAnnotation("@Data");
+
+        topLevelClass.addImportedType("lombok.Builder");
         topLevelClass.addAnnotation("@Builder");
+
+        topLevelClass.addImportedType("lombok.NoArgsConstructor");
         topLevelClass.addAnnotation("@NoArgsConstructor");
+
+        topLevelClass.addImportedType("lombok.AllArgsConstructor");
         topLevelClass.addAnnotation("@AllArgsConstructor");
-        topLevelClass.addAnnotation("@EqualsAndHashCode(callSuper = true)");
+
+        if (lombokConfig.getHasParent()) {
+            topLevelClass.addImportedType("lombok.EqualsAndHashCode");
+            topLevelClass.addAnnotation("@EqualsAndHashCode(callSuper = true)");
+        }
 
         return true;
     }

@@ -1,13 +1,12 @@
 package io.daff.mybatis.plugin;
 
+import io.daff.mybatis.config.CommentConfig;
 import org.mybatis.generator.api.CommentGenerator;
 import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.dom.java.*;
 import org.mybatis.generator.api.dom.xml.XmlElement;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Properties;
 import java.util.Set;
 
@@ -19,16 +18,17 @@ import java.util.Set;
  */
 public class CommentPlugin implements CommentGenerator {
 
-    private String currentDateStr;
+    /**
+     * 注释模板模型
+     */
+    private CommentConfig commentModel;
 
     public CommentPlugin() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
-        currentDateStr = sdf.format(new Date());
+        commentModel = new CommentConfig();
     }
 
     @Override
     public void addConfigurationProperties(Properties properties) {
-
     }
 
     /**
@@ -37,9 +37,6 @@ public class CommentPlugin implements CommentGenerator {
     @Override
     public void addFieldComment(Field field, IntrospectedTable introspectedTable, IntrospectedColumn introspectedColumn) {
 
-//        if ("id".equals(field.getName())) {
-//            return;
-//        }
         StringBuilder sb = new StringBuilder();
         field.addJavaDocLine("/**");
         sb.append(" * ");
@@ -58,25 +55,14 @@ public class CommentPlugin implements CommentGenerator {
         String sb = "/**\n" +
                     " * " + introspectedTable.getFullyQualifiedTable() + "表的实体类\n" +
                     " *\n" +
-                    " * @author     daffupman\n" +
-                    " * @since      " + currentDateStr + "\n" +
+                    " * @author\t"+ commentModel.getAuthor() +"\n" +
+                    " * @since\t" + commentModel.getDate() + "\n" +
                     " **/";
         topLevelClass.addJavaDocLine(sb);
     }
 
-    /**
-     * Java类上的注释
-     */
     @Override
     public void addClassComment(InnerClass innerClass, IntrospectedTable introspectedTable) {
-        StringBuilder sb = new StringBuilder();
-        innerClass.addJavaDocLine("/**");
-        sb.append(" * ");
-        sb.append(introspectedTable.getFullyQualifiedTable());
-        sb.append(" ");
-        sb.append(currentDateStr);
-        innerClass.addJavaDocLine(sb.toString().replace("\n", " "));
-        innerClass.addJavaDocLine(" */");
     }
 
     @Override
