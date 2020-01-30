@@ -10,4 +10,5 @@
     <result column="age" jdbcType="INTEGER" property="age" />
     <result column="gender" jdbcType="VARCHAR" property="gender" />
   </resultMap>
+
 </mapper>

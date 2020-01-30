@@ -23,7 +23,8 @@
         <!-- 通用mapper插件 -->
         <plugin type="tk.mybatis.mapper.generator.MapperPlugin">
             <!-- 通用mapper提供的mapper接口，可切换为自定义的mapper接口 -->
-            <property name="mappers" value="tk.mybatis.mapper.common.Mapper"/>
+<!--            <property name="mappers" value="tk.mybatis.mapper.common.Mapper"/>-->
+            <property name="mappers" value="io.daff.base.mapper.BaseMapper"/>
             <property name="caseSensitive" value="true"/>
             <property name="forceAnnotation" value="true"/>
             <property name="beginningDelimiter" value="`"/>

@@ -1,4 +1,4 @@
-package io.daff.base;
+package io.daff.base.entity;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
