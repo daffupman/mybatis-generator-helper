@@ -9,7 +9,7 @@
                 MyBatis3Simple 	表示带有单表的简单的增，删，改，查(没有Example类)
                 MyBatis3		表示带有单表的增，删，改，查，之外，还有类似Hiberante 的 QBC复杂查询(有Example类)
      -->
-    <context id="DB2Tables" targetRuntime="MyBatis3">
+    <context id="MySQL" targetRuntime="MyBatis3Simple">
 
         <property name="beginningDelimiter" value="`"/>
         <property name="endingDelimiter" value="`"/>
@@ -18,11 +18,17 @@
         <plugin type="io.daff.mybatis.plugin.LombokPlugin"/>
         <!-- swagger插件 -->
         <plugin type="io.daff.mybatis.plugin.SwaggerPlugin"/>
-<!--        <plugin type="tk.mybatis.mapper.generator.MapperPlugin">-->
-<!--            <property name="mappers" value="io.daff.mybatis.base.BaseMapper"/>-->
-<!--        </plugin>-->
         <!-- 整合序列化插件 -->
         <plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>
+        <!-- 通用mapper插件 -->
+        <plugin type="tk.mybatis.mapper.generator.MapperPlugin">
+            <!-- 通用mapper提供的mapper接口，可切换为自定义的mapper接口 -->
+            <property name="mappers" value="tk.mybatis.mapper.common.Mapper"/>
+            <property name="caseSensitive" value="true"/>
+            <property name="forceAnnotation" value="true"/>
+            <property name="beginningDelimiter" value="`"/>
+            <property name="endingDelimiter" value="`"/>
+        </plugin>
 
         <!-- 去掉全部的注释 -->
         <commentGenerator type="io.daff.mybatis.plugin.CommentPlugin">
@@ -54,7 +60,7 @@
             targetPackage 属性设置生成的类的包名
             targetProject 属性设置生成的工程的路径    一般生成为当前工程。写为 .\
          -->
-        <javaModelGenerator targetPackage="io.daff.result.entity" targetProject=".\generator\src\main\java">
+        <javaModelGenerator targetPackage="io.daff.generate.entity" targetProject=".\generator\src\main\java">
             <property name="enableSubPackages" value="true" />
             <property name="trimStrings" value="true" />
             <!-- 指定基类：指定基类时，需要在table表中打开需要忽略的列名 -->
@@ -65,7 +71,7 @@
             targetPackage 属性设置生成的sql配置文件的包名
             targetProject 属性设置生成的工程的路径    一般生成为当前工程。写为 .\
          -->
-        <sqlMapGenerator targetPackage="io.daff.result.xml"  targetProject=".\generator\src\main\java">
+        <sqlMapGenerator targetPackage="mapper"  targetProject=".\generator\src\main\resources">
             <property name="enableSubPackages" value="true" />
         </sqlMapGenerator>
 
@@ -74,7 +80,7 @@
             targetPackage 属性设置生成的mybatis的调用代码，比如mapper之类的接口
             targetProject 属性设置生成的工程的路径    一般生成为当前工程。写为 .\
          -->
-        <javaClientGenerator type="XMLMAPPER" targetPackage="io.daff.result.mapper"
+        <javaClientGenerator type="XMLMAPPER" targetPackage="io.daff.generate.mapper"
                              targetProject=".\generator\src\main\java">
             <property name="enableSubPackages" value="true" />
         </javaClientGenerator>

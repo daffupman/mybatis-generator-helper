@@ -20,12 +20,12 @@ public class GeneratorMapper {
     public static void main(String[] args) throws Exception {
 
         List<String> warnings = new ArrayList<>();
-
+        boolean overwrite = true;
         // 指定mybatis逆向工程的配置文件 mybatis-generator.xml
         File configFile = new File("generator/src/main/resources/mybatis-generator.xml");
         ConfigurationParser cp = new ConfigurationParser(warnings);
         Configuration config = cp.parseConfiguration(configFile);
-        DefaultShellCallback callback = new DefaultShellCallback(true);
+        DefaultShellCallback callback = new DefaultShellCallback(overwrite);
         MyBatisGenerator myBatisGenerator = new MyBatisGenerator(config, callback, warnings);
         myBatisGenerator.generate(null);
     }
