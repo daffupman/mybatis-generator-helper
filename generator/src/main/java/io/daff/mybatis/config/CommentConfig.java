@@ -1,6 +1,7 @@
 package io.daff.mybatis.config;
 
 import lombok.Data;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,9 +32,9 @@ public class CommentConfig {
         this.loadProperties();
     }
 
-    /*
-        读取classpath下的comment.properties文件
-        构造注释信息
+    /**
+     * 读取classpath下的comment.properties文件
+     * 构造注释信息
      */
     private void loadProperties() {
         Properties prop;

@@ -4,6 +4,9 @@
         "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 
 <generatorConfiguration>
+
+<!--    <properties resource=""/>-->
+
     <!--
             targetRuntime 属性设置生成的代码是什么样的版本
                 MyBatis3Simple 	表示带有单表的简单的增，删，改，查(没有Example类)
@@ -20,6 +23,8 @@
         <plugin type="io.daff.mybatis.plugin.SwaggerPlugin"/>
         <!-- 整合序列化插件 -->
         <plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>
+        <!-- 类注释插件 -->
+        <plugin type="io.daff.mybatis.plugin.CommentPlugin"/>
         <!-- 通用mapper插件 -->
         <plugin type="tk.mybatis.mapper.generator.MapperPlugin">
             <!-- 通用mapper提供的mapper接口，可切换为自定义的mapper接口 -->
@@ -30,11 +35,15 @@
             <property name="beginningDelimiter" value="`"/>
             <property name="endingDelimiter" value="`"/>
         </plugin>
+        <!-- 自动生成service层代码插件 -->
+        <plugin type="io.daff.mybatis.plugin.ServicePlugin"/>
+        <!-- 自动生成controller层代码插件 -->
+        <plugin type="io.daff.mybatis.plugin.ControllerPlugin"/>
 
         <!-- 去掉全部的注释 -->
-        <commentGenerator type="io.daff.mybatis.plugin.CommentPlugin">
+        <commentGenerator>
             <!-- 是否去除自动生成的注释 true：是；false：否 -->
-            <property name="suppressAllComments" value="false" />
+            <property name="suppressAllComments" value="true" />
         </commentGenerator>
 
         <!--
