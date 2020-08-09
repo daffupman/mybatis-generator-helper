@@ -41,7 +41,7 @@ public interface ${entityClassName}Service {
     /**
     * 按主键查询记录
     */
-    User selectById(Integer id);
+    ${entityClassName} selectById(Integer id);
 
     /**
     * 查询所有记录
