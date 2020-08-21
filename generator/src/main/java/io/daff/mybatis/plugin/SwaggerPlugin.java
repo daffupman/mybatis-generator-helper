@@ -26,7 +26,7 @@ public class SwaggerPlugin extends PluginAdapter {
         topLevelClass.addImportedType("io.swagger.annotations.ApiModel");
         topLevelClass.addImportedType("io.swagger.annotations.ApiModelProperty");
         topLevelClass.addAnnotation(
-                "@ApiModel(value=\""
+                "@ApiModel(value = \""
                 + introspectedTable.getFullyQualifiedTable() + "表的实体类"
                 + "\")"
         );
@@ -38,7 +38,7 @@ public class SwaggerPlugin extends PluginAdapter {
     public boolean modelFieldGenerated(Field field, TopLevelClass topLevelClass, IntrospectedColumn introspectedColumn, IntrospectedTable introspectedTable, ModelClassType modelClassType) {
 
         field.addAnnotation(
-                "@ApiModelProperty(value=\""
+                "@ApiModelProperty(value = \""
                         + introspectedColumn.getRemarks()
                         + "\")"
         );

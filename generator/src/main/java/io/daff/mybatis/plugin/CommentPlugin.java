@@ -36,8 +36,8 @@ public class CommentPlugin extends PluginAdapter {
         String sb = "/**\n" +
                 " * " + introspectedTable.getFullyQualifiedTable() + "表的实体类\n" +
                 " *\n" +
-                " * @author\t"+ commentModel.getAuthor() +"\n" +
-                " * @since\t" + commentModel.getDate() + "\n" +
+                " * @author "+ commentModel.getAuthor() +"\n" +
+                " * @since " + commentModel.getDate() + "\n" +
                 " */";
         topLevelClass.addJavaDocLine(sb);
 
