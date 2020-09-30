@@ -36,11 +36,14 @@
 
 ##  功能
 
-### v1.1
+### v0.0.3
+- 扩充BaseMapper功能：批量新增，可忽略更新
+
+### v0.0.2
 - 集成通用mapper
 - 增加批量更新功能
 
-### v1.0
+### v0.0.1
 
 - 按需生成entity，mapper接口和mapper映射文件
 - 整合lombok和swagger

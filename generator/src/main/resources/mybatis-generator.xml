@@ -20,7 +20,7 @@
         <!-- 整合lombok插件 -->
         <plugin type="io.daff.mybatis.plugin.LombokPlugin"/>
         <!-- swagger插件 -->
-        <plugin type="io.daff.mybatis.plugin.SwaggerPlugin"/>
+<!--        <plugin type="io.daff.mybatis.plugin.SwaggerPlugin"/>-->
         <!-- 整合序列化插件 -->
         <plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>
         <!-- 类注释插件 -->
@@ -50,8 +50,8 @@
             jdbcConnection 为数据库连接的四要素信息。
             请修改成为你自己的内容
          -->
-        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://192.168.35.65:3306/test"
+        <jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
+                        connectionURL="jdbc:mysql://192.168.35.40:3306/acs?characterEncoding=utf8&amp;useSSL=false"
                         userId="root"
                         password="root">
         </jdbcConnection>
@@ -70,7 +70,7 @@
             targetPackage 属性设置生成的类的包名
             targetProject 属性设置生成的工程的路径    一般生成为当前工程。写为 .\
          -->
-        <javaModelGenerator targetPackage="io.daff.generate.entity" targetProject=".\generator\src\main\java">
+        <javaModelGenerator targetPackage="io.daff.acs.entity.po" targetProject=".\generator\src\main\java">
             <property name="enableSubPackages" value="true" />
             <property name="trimStrings" value="true" />
             <!-- 指定基类：指定基类时，需要在table表中打开需要忽略的列名 -->
@@ -90,7 +90,7 @@
             targetPackage 属性设置生成的mybatis的调用代码，比如mapper之类的接口
             targetProject 属性设置生成的工程的路径    一般生成为当前工程。写为 .\
          -->
-        <javaClientGenerator type="XMLMAPPER" targetPackage="io.daff.generate.mapper"
+        <javaClientGenerator type="XMLMAPPER" targetPackage="io.daff.acs.mapper"
                              targetProject=".\generator\src\main\java">
             <property name="enableSubPackages" value="true" />
         </javaClientGenerator>
@@ -101,9 +101,16 @@
                 domainObjectName	是javaBean名
          -->
         <!-- 单张表，%：映射所有表 -->
-        <table tableName="user" domainObjectName="User">
+<!--        <table tableName="lock" domainObjectName="lock">-->
                 <!-- 在继承基类时，需要指定忽略的column -->
 <!--            <ignoreColumn column="id"/>-->
-        </table>
+<!--        </table>-->
+<!--        <table tableName="%"/>-->
+        <table tableName="permission" domainObjectName="Permission"/>
+        <table tableName="notice" domainObjectName="Notice"/>
+        <table tableName="role" domainObjectName="Role"/>
+        <table tableName="user_things" domainObjectName="UserThings"/>
+        <table tableName="role_permission_mapping" domainObjectName="RolePermissionMapping"/>
+        <table tableName="user_role_mapping" domainObjectName="UserRoleMapping"/>
     </context>
 </generatorConfiguration>

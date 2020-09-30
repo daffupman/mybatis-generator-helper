@@ -23,46 +23,67 @@ public class BatchInsertSelectiveProvider extends MapperTemplate {
 
     /**
      * 拼接批量插入的sql语句
+     *
+     * <foreach collection="list" item="record" separator=";">
+     *      insert into t_employee
+     *      <trim prefix="(" suffix=")" suffixOverrides=",">
+     *          <if test="record.emp_name != null">emp_name,</if>
+     *          <if test="record.emp_age != null">emp_age,</if>
+     *          <if test="record.emp_salary != null">emp_salary,</if>
+     *      </trim>
+     *      VALUES
+     *      <trim prefix="(" suffix=")" suffixOverrides=",">
+     *          <if test="record.emp_name != null">
+     *              #{record.empName},
+     *          </if>
+     *          <if test="record.emp_age != null">
+     *              #{record.empAge},
+     *          </if>
+     *          <if test="record.emp_salary != null">
+     *              #{record.empSalary}
+     *          </if>
+     *      </trim>
+     * </foreach>
      */
     public String batchInsertSelective(MappedStatement ms) {
-
-        // TODO 批量更新的sql语句
 
         // 获取实体类
         Class<?> entityClass = super.getEntityClass(ms);
         // 获取表名
         String tableName = super.tableName(entityClass);
-        // 获取sql语句的update子句
-        String updateClause = SqlHelper.updateTable(entityClass, tableName);
+        // 获取sql语句的insert子句
+        String insertClause = SqlHelper.insertIntoTable(entityClass, tableName);
 
         // 获取实体类的属性
         Set<EntityColumn> columnSet = EntityHelper.getColumns(entityClass);
-        // set子句
-        StringBuilder setClause = new StringBuilder(1024);
-        String idColumn = null;
-        String idHolder = null;
+        // insert子句
+        StringBuilder fieldClause = new StringBuilder(1024);
+        StringBuilder valueClause = new StringBuilder(1024);
         for (EntityColumn e : columnSet) {
-            if (e.isId()) {
-                // 当前列为主键，记录相关信息拼接where子句
-                idColumn = e.getColumn();
-                idHolder = e.getColumnHolder("record");
-            } else {
-                // 否则拼接到set子句中
-                String column = e.getColumn();
-                String columnHolder = e.getColumnHolder("record");
-                setClause.append("<if test=\"record.").append(e.getProperty()).append(" != null\">").append("\n");
-                setClause.append(column).append(" = ").append(columnHolder).append(",").append("\n");
-                setClause.append("</if>").append("\n");
-            }
+            String column = e.getColumn();
+            String property = e.getProperty();
+            String columnHolder = e.getColumnHolder("record");
+
+            fieldClause.append("<if test=\"record.").append(property).append(" != null\">").append(column).append(",").append("</if>").append("\n");
+
+            valueClause.append("<if test=\"record.").append(property).append(" != null\">").append("\n");
+            valueClause.append(columnHolder).append(",").append("\n");
+            valueClause.append("</if>").append("\n");
         }
 
         // 拼接sql
-        return  "<foreach collection=\"list\" item=\"record\" separator=\";\">" + "\n" +
-                updateClause + "\n" +
-                "<set>" + "\n" +
-                setClause +
-                "</set>" + "\n" +
-                "WHERE " + idColumn + " = " + idHolder + "\n" +
+        return insertClause + "\n" +
+                "<foreach collection=\"list\" item=\"record\" index=\"index\">" + "\n" +
+                "<if test=\"index == 0\"><trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">" + "\n" +
+                fieldClause +
+                "</trim></if>" +
+                "</foreach>" +
+                "VALUES" + "\n" +
+                "<foreach collection=\"list\" item=\"record\" separator=\",\">" + "\n" +
+                "<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">" + "\n" +
+                valueClause +
+                "</trim>" + "\n" +
                 "</foreach>";
     }
+
 }

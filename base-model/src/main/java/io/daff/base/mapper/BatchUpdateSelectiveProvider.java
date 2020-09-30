@@ -7,7 +7,9 @@ import tk.mybatis.mapper.mapperhelper.MapperHelper;
 import tk.mybatis.mapper.mapperhelper.MapperTemplate;
 import tk.mybatis.mapper.mapperhelper.SqlHelper;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 批量更新的提供类
@@ -24,25 +26,35 @@ public class BatchUpdateSelectiveProvider extends MapperTemplate {
     /**
      * 批量更新的执行逻辑
      *
-     * <foreach collection="list" item="record" separator=";">
      *     update
      *          t_employee
-     *     <set>
-     *         <if test="emp_name != null">
-     *              emp_name = #{record.empName},
-     *         </if>
-     *         <if test="emp_age != null">
-     *              emp_age = #{record.empAge},
-     *         </if>
-     *         <if test="emp_salary != null">
-     *              emp_salary = #{record.empSalary}
-     *         </if>
-     *
-     *
-     *     </set>
-     *     where
-     *          emp_id = #{record.empId}
-     * </foreach>
+     *     <trim prefix="set" suffixOverrides=",">
+     *         <trim prefix="emp_name = case" suffix="end,">
+     *             <foreach collection="list" item="item" index="index">
+     *                 <if test="item.emp_name != null">
+     *                     when id = #{item.id} then #{item.empName}
+     *                 </if>
+     *             </foreach>
+     *         </trim>
+     *         <trim prefix="emp_age = case" suffix="end,">
+     *             <foreach collection="list" item="item" index="index">
+     *                 <if test="item.emp_age != null">
+     *                     when id = #{item.id} then #{item.empAge}
+     *                 </if>
+     *             </foreach>
+     *         </trim>
+     *         <trim prefix="emp_salary = case" suffix="end,">
+     *             <foreach collection="list" item="item" index="index">
+     *                 <if test="item.emp_salary != null">
+     *                     when id = #{item.id} then #{item.empSalary}
+     *                 </if>
+     *             </foreach>
+     *         </trim>
+     *     </trim>
+     *     WHERE id in
+     *     <foreach collection="list" item="item" open="(" close=")">
+     *         #{item.id}
+     *     </foreach>
      */
     public String batchUpdateSelective(MappedStatement ms) {
 
@@ -56,31 +68,42 @@ public class BatchUpdateSelectiveProvider extends MapperTemplate {
         // 获取实体类的属性
         Set<EntityColumn> columnSet = EntityHelper.getColumns(entityClass);
         // set子句
-        StringBuilder setClause = new StringBuilder(1024);
-        String idColumn = null;
-        String idHolder = null;
+        StringBuilder trimClause = new StringBuilder(1024);
+
+        List<EntityColumn> idColumnList = columnSet.stream().filter(EntityColumn::isId).collect(Collectors.toList());
+        if (idColumnList.size() != 1) {
+            throw new IllegalArgumentException("class:" + entityClass + ", must has one id");
+        }
+        // 当前列为主键，记录相关信息拼接where子句
+        String idColumn = idColumnList.get(0).getColumn();
+        String idProperty = idColumnList.get(0).getProperty();
+
         for (EntityColumn e : columnSet) {
-            if (e.isId()) {
-                // 当前列为主键，记录相关信息拼接where子句
-                idColumn = e.getColumn();
-                idHolder = e.getColumnHolder("record");
-            } else {
+            if (!e.isId()) {
                 // 否则拼接到set子句中
                 String column = e.getColumn();
-                String columnHolder = e.getColumnHolder("record");
-                setClause.append("<if test=\"record.").append(e.getProperty()).append(" != null\">").append("\n");
-                setClause.append(column).append(" = ").append(columnHolder).append(",").append("\n");
-                setClause.append("</if>").append("\n");
+                String property = e.getProperty();
+
+                trimClause.append("<trim prefix=\"").append(column).append(" = case\" suffix=\"end,\">").append("\n");
+                trimClause.append("<foreach collection=\"list\" item=\"item\">").append("\n");
+                trimClause.append("<if test=\"item.").append(property).append(" != null\">").append("\n");
+                trimClause.append("when ").append(idColumn).append(" = #{item.").append(idProperty).append("} then #{item.").append(property).append("}").append("\n");
+                trimClause.append("</if>").append("\n");
+                trimClause.append("</foreach>").append("\n");
+                trimClause.append("</trim>").append("\n");
             }
         }
 
-        // 拼接sql
-        return  "<foreach collection=\"list\" item=\"record\" separator=\";\">" + "\n" +
-                updateClause + "\n" +
-                "<set>" + "\n" +
-                setClause +
-                "</set>" + "\n" +
-                "WHERE " + idColumn + " = " + idHolder + "\n" +
+        String whereClause = " WHERE " + idColumn + " IN " +
+                "<foreach collection=\"list\" item=\"item\" open=\"(\" close=\")\" separator=\",\">" +
+                "#{item." + idProperty + "}" +
                 "</foreach>";
+
+        // 拼接sql
+        return  updateClause +
+                "<trim prefix=\"set\" suffixOverrides=\",\">" + "\n" +
+                trimClause +
+                "</trim>" + "\n" +
+                whereClause;
     }
 }

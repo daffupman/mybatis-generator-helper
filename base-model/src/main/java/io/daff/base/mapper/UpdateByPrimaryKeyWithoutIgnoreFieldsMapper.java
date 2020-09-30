@@ -13,9 +13,9 @@ import java.util.List;
  * @since 2020/1/29
  */
 @RegisterMapper
-public interface BatchUpdateSelectiveMapper<T> {
+public interface UpdateByPrimaryKeyWithoutIgnoreFieldsMapper<T> {
 
     @Options(useGeneratedKeys = true)
-    @UpdateProvider(type = BatchUpdateSelectiveProvider.class, method = "dynamicSQL")
-    int batchUpdateSelective(List<T> list);
+    @UpdateProvider(type = UpdateByPrimaryKeyWithoutIgnoreFieldsProvider.class, method = "dynamicSQL")
+    int updateByPrimaryKeyWithoutIgnoreFields(List<T> list);
 }
