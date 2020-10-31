@@ -25,16 +25,19 @@
         <plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>
         <!-- 类注释插件 -->
         <plugin type="io.daff.mybatis.plugin.CommentPlugin"/>
+        <plugin type="io.daff.mybatis.plugin.DefaultMapperPlugin"/>
+        <!--生成mapper.xml时覆盖原文件-->
+        <plugin type="org.mybatis.generator.plugins.UnmergeableXmlMappersPlugin" />
         <!-- 通用mapper插件 -->
-        <plugin type="tk.mybatis.mapper.generator.MapperPlugin">
-            <!-- 通用mapper提供的mapper接口，可切换为自定义的mapper接口 -->
-<!--            <property name="mappers" value="tk.mybatis.mapper.common.Mapper"/>-->
-            <property name="mappers" value="io.daff.base.mapper.BaseMapper"/>
-            <property name="caseSensitive" value="true"/>
-            <property name="forceAnnotation" value="true"/>
-            <property name="beginningDelimiter" value="`"/>
-            <property name="endingDelimiter" value="`"/>
-        </plugin>
+<!--        <plugin type="tk.mybatis.mapper.generator.MapperPlugin">-->
+<!--            &lt;!&ndash; 通用mapper提供的mapper接口，可切换为自定义的mapper接口 &ndash;&gt;-->
+<!--&lt;!&ndash;            <property name="mappers" value="tk.mybatis.mapper.common.Mapper"/>&ndash;&gt;-->
+<!--            <property name="mappers" value="io.daff.base.mapper.BaseMapper"/>-->
+<!--            <property name="caseSensitive" value="true"/>-->
+<!--            <property name="forceAnnotation" value="true"/>-->
+<!--            <property name="beginningDelimiter" value="`"/>-->
+<!--            <property name="endingDelimiter" value="`"/>-->
+<!--        </plugin>-->
         <!-- 自动生成service层代码插件 -->
         <plugin type="io.daff.mybatis.plugin.ServicePlugin"/>
         <!-- 自动生成controller层代码插件 -->
@@ -106,11 +109,14 @@
 <!--            <ignoreColumn column="id"/>-->
 <!--        </table>-->
 <!--        <table tableName="%"/>-->
-        <table tableName="permission" domainObjectName="Permission"/>
-        <table tableName="notice" domainObjectName="Notice"/>
-        <table tableName="role" domainObjectName="Role"/>
-        <table tableName="user_things" domainObjectName="UserThings"/>
-        <table tableName="role_permission_mapping" domainObjectName="RolePermissionMapping"/>
-        <table tableName="user_role_mapping" domainObjectName="UserRoleMapping"/>
+<!--        <table tableName="permission" domainObjectName="Permission"/>-->
+<!--        <table tableName="notice" domainObjectName="Notice"/>-->
+<!--        <table tableName="role" domainObjectName="Role"/>-->
+<!--        <table tableName="user_things" domainObjectName="UserThings"/>-->
+<!--        <table tableName="role_permission_mapping" domainObjectName="RolePermissionMapping"/>-->
+        <table tableName="operation_log" domainObjectName="OperationLog">
+            <columnOverride column="old_value" javaType="java.lang.String" jdbcType="VARCHAR" />
+            <columnOverride column="new_value" javaType="java.lang.String" jdbcType="VARCHAR" />
+        </table>
     </context>
 </generatorConfiguration>
