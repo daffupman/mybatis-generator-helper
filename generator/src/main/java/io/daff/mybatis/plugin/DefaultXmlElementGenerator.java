@@ -1,6 +1,5 @@
 package io.daff.mybatis.plugin;
 
-import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.dom.xml.Attribute;
 import org.mybatis.generator.api.dom.xml.Element;
 import org.mybatis.generator.api.dom.xml.TextElement;
@@ -8,7 +7,6 @@ import org.mybatis.generator.api.dom.xml.XmlElement;
 import org.mybatis.generator.codegen.mybatis3.MyBatis3FormattingUtilities;
 import org.mybatis.generator.codegen.mybatis3.xmlmapper.elements.AbstractXmlElementGenerator;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,94 +23,23 @@ public class DefaultXmlElementGenerator extends AbstractXmlElementGenerator {
 
         addBaseSelectFields(parentElement);
         addBatchInsertXmlElement(parentElement);
-        addDeleteXmlElement(parentElement);
         addDeleteByIdsXmlElement(parentElement);
-        addBatchUpdateById(parentElement);
         addSelectXmlElement(parentElement);
         addSelectByIds(parentElement);
-
-        // // 增加base_query
-        // XmlElement sql = new XmlElement("sql");
-        // sql.addAttribute(new Attribute("id", "base_query"));
-        // //在这里添加where条件
-        // XmlElement selectTrimElement = new XmlElement("trim"); //设置trim标签
-        // selectTrimElement.addAttribute(new Attribute("prefix", "WHERE"));
-        // selectTrimElement.addAttribute(new Attribute("prefixOverrides", "AND | OR")); //添加where和and
-        // StringBuilder sb = new StringBuilder();
-        // for(IntrospectedColumn introspectedColumn : introspectedTable.getAllColumns()) {
-        //     XmlElement selectNotNullElement = new XmlElement("if"); //$NON-NLS-1$
-        //     sb.setLength(0);
-        //     sb.append("null != ");
-        //     sb.append(introspectedColumn.getJavaProperty());
-        //     selectNotNullElement.addAttribute(new Attribute("test", sb.toString()));
-        //     sb.setLength(0);
-        //     // 添加and
-        //     sb.append(" and ");
-        //     // 添加别名t
-        //     sb.append("t.");
-        //     sb.append(MyBatis3FormattingUtilities.getEscapedColumnName(introspectedColumn));
-        //     // 添加等号
-        //     sb.append(" = ");
-        //     sb.append(MyBatis3FormattingUtilities.getParameterClause(introspectedColumn));
-        //     selectNotNullElement.addElement(new TextElement(sb.toString()));
-        //     selectTrimElement.addElement(selectNotNullElement);
-        // }
-        // sql.addElement(selectTrimElement);
-        // parentElement.addElement(sql);
-        //
-        // // 公用select
-        // sb.setLength(0);
-        // sb.append("select ");
-        // sb.append("t.* ");
-        // sb.append("from ");
-        // sb.append(introspectedTable.getFullyQualifiedTableNameAtRuntime());
-        // sb.append(" t");
-        // TextElement selectText = new TextElement(sb.toString());
-        //
-        // // 公用include
-        // XmlElement include = new XmlElement("include");
-        // include.addAttribute(new Attribute("refid", "base_query"));
-        //
-        // // 增加find
-        // XmlElement find = new XmlElement("select");
-        // find.addAttribute(new Attribute("id", "find"));
-        // find.addAttribute(new Attribute("resultMap", "BaseResultMap"));
-        // find.addAttribute(new Attribute("parameterType", introspectedTable.getBaseRecordType()));
-        // find.addElement(selectText);
-        // find.addElement(include);
-        // parentElement.addElement(find);
-        //
-        // // 增加list
-        // XmlElement list = new XmlElement("select");
-        // list.addAttribute(new Attribute("id", "list"));
-        // list.addAttribute(new Attribute("resultMap", "BaseResultMap"));
-        // list.addAttribute(new Attribute("parameterType", introspectedTable.getBaseRecordType()));
-        // list.addElement(selectText);
-        // list.addElement(include);
-        // parentElement.addElement(list);
-        //
-        // // 增加pageList
-        // XmlElement pageList = new XmlElement("select");
-        // pageList.addAttribute(new Attribute("id", "pageList"));
-        // pageList.addAttribute(new Attribute("resultMap", "BaseResultMap"));
-        // pageList.addAttribute(new Attribute("parameterType", introspectedTable.getBaseRecordType()));
-        // pageList.addElement(selectText);
-        // pageList.addElement(include);
-        // parentElement.addElement(pageList);
     }
 
+    /**
+     * 自动生成根据id列表查询的功能
+     */
     private void addSelectByIds(XmlElement parentElement) {
 
-        StringBuilder sqlBuilder = new StringBuilder(100);
-        String baseSelectFields = introspectedTable.getAllColumns().stream()
-                .map(MyBatis3FormattingUtilities::getEscapedColumnName).collect(Collectors.joining(", "));
-        sqlBuilder.append("select\t").append(baseSelectFields).append("\r\n")
-                .append("\t\tFROM\t").append(introspectedTable.getFullyQualifiedTableNameAtRuntime()).append("\r\n")
-                .append("\t\tWHERE\t").append(introspectedTable.getPrimaryKeyColumns().get(0).getActualColumnName()).append("\r\n")
-                .append("\t\t<foreach collection=\"list\" item=\"item\" open=\"IN (\" close=\")\" separator=\",\">\r\n")
-                .append("\t\t\t").append("#{item.").append(introspectedTable.getPrimaryKeyColumns().get(0).getActualColumnName()).append("}").append("\r\n")
-                .append("\t\t</foreach>");
-        TextElement selectByIdsTextElement = new TextElement(sqlBuilder.toString());
+        String sqlBuilder = "select\t" + "<include refid=\"baseSelectFields\"/>" + "\r\n" +
+                "\tfrom " + introspectedTable.getFullyQualifiedTableNameAtRuntime() + "\r\n" +
+                "\twhere " + introspectedTable.getPrimaryKeyColumns().get(0).getActualColumnName() + "\r\n" +
+                "\t\t<foreach collection=\"collection\" item=\"item\" open=\"in (\" close=\")\" separator=\",\">\r\n" +
+                "\t\t\t" + "#{item}" + "\r\n" +
+                "\t\t</foreach>";
+        TextElement selectByIdsTextElement = new TextElement(sqlBuilder);
 
         XmlElement selectByIds = new XmlElement("select");
         selectByIds.addAttribute(new Attribute("id", "selectByIds"));
@@ -121,40 +48,124 @@ public class DefaultXmlElementGenerator extends AbstractXmlElementGenerator {
         parentElement.addElement(selectByIds);
     }
 
+    /**
+     * 自动生成按条件查询记录的功能
+     */
     private void addSelectXmlElement(XmlElement parentElement) {
-        StringBuilder sqlBuilder = new StringBuilder(100);
-        String baseSelectFields = introspectedTable.getAllColumns().stream()
-                .map(MyBatis3FormattingUtilities::getEscapedColumnName).collect(Collectors.joining(", "));
-        sqlBuilder.append("select\t").append(baseSelectFields).append("\r\n")
-                .append("\t\tFROM\t").append(introspectedTable.getFullyQualifiedTableNameAtRuntime()).append("\r\n")
-                .append("\t\t<WHERE>").append("<trim suffixOverride=\",\">")
-                .append("</trim>")
-                .append("\t\t</WHERE>");
+        StringBuilder sqlBuilder = new StringBuilder(1024);
+
+        List<EntityProperty> javaEntityPropertyList = introspectedTable.getBaseColumns().stream()
+                .map(each -> new EntityProperty(each.getJavaProperty(), each.getFullyQualifiedJavaType().getShortName(), each.getActualColumnName()))
+                .collect(Collectors.toList());
+
+        // 构造where的条件语句
+        StringBuilder ifBuilder = new StringBuilder(256);
+        javaEntityPropertyList.forEach(each -> {
+            StringBuilder ifItemBuilder = new StringBuilder(128);
+            String propertyName = each.getPropertyName();
+            String testCondition = propertyName + " != null";
+            if (each.getJavaShortPropertyType().equalsIgnoreCase("string")) {
+                testCondition += " and " + propertyName + " != ''";
+            }
+            ifItemBuilder.append("\t\t<if test=\"").append(testCondition).append("\">\n")
+                    .append("\t\t  ").append(each.getColumnName()).append(" = ").append("#{").append(each.getPropertyName()).append("}").append("\n")
+                    .append("\t\t</if>\n");
+
+            ifBuilder.append(ifItemBuilder);
+        });
+
+        sqlBuilder.append("select ").append("<include refid=\"baseSelectFields\"/>").append("\r\n")
+                .append("\tfrom ").append(introspectedTable.getFullyQualifiedTableNameAtRuntime()).append("\r\n")
+                .append("\t<where>\n")
+                .append("\t  <trim suffixOverrides=\",\">\n")
+                .append(ifBuilder)
+                .append("\t  </trim>\n")
+                .append("\t</where>");
         TextElement selectByIdsTextElement = new TextElement(sqlBuilder.toString());
 
-        XmlElement selectByIds = new XmlElement("select");
-        selectByIds.addAttribute(new Attribute("id", "select"));
-        selectByIds.addAttribute(new Attribute("resultMap", "BaseResultMap"));
-        selectByIds.addElement(selectByIdsTextElement);
-        parentElement.addElement(selectByIds);
+        XmlElement select = new XmlElement("select");
+        select.addAttribute(new Attribute("id", "select"));
+        select.addAttribute(new Attribute("resultMap", "BaseResultMap"));
+        select.addElement(selectByIdsTextElement);
+        parentElement.addElement(select);
     }
 
-    private void addBatchUpdateById(XmlElement parentElement) {
-
-    }
-
+    /**
+     * 自动生成按id列表删除的功能
+     */
     private void addDeleteByIdsXmlElement(XmlElement parentElement) {
+        String sqlBuilder = "delete from " + introspectedTable.getFullyQualifiedTableNameAtRuntime() + "\r\n" +
+                "\twhere " + introspectedTable.getPrimaryKeyColumns().get(0).getActualColumnName() + "\r\n" +
+                "\t  <foreach collection=\"collection\" item=\"item\" open=\"in (\" close=\")\" separator=\",\">\r\n" +
+                "\t\t" + "#{item}" + "\r\n" +
+                "\t  </foreach>";
+        TextElement deleteByIdsTextElement = new TextElement(sqlBuilder);
 
+        XmlElement deleteByIds = new XmlElement("delete");
+        deleteByIds.addAttribute(new Attribute("id", "deleteByIds"));
+        deleteByIds.addElement(deleteByIdsTextElement);
+        parentElement.addElement(deleteByIds);
     }
 
-    private void addDeleteXmlElement(XmlElement parentElement) {
-
-    }
-
+    /**
+     * 自动生成批量更新的功能
+     */
     private void addBatchInsertXmlElement(XmlElement parentElement) {
+        StringBuilder sqlBuilder = new StringBuilder();
 
+        StringBuilder columnBuilder = new StringBuilder(128);
+        StringBuilder valueBuilder = new StringBuilder(512);
+        List<EntityProperty> javaEntityPropertyList = introspectedTable.getBaseColumns().stream()
+                .map(each -> new EntityProperty(each.getJavaProperty(), each.getFullyQualifiedJavaType().getShortName(), each.getActualColumnName()))
+                .collect(Collectors.toList());
+
+        javaEntityPropertyList.forEach(each -> {
+            StringBuilder columnItemBuilder = new StringBuilder(128);
+            StringBuilder valueItemBuilder = new StringBuilder(128);
+            String propertyName = each.getPropertyName();
+            columnItemBuilder.append("\t\t<if test=\"").append(getTestCondition("collection[0]", propertyName, each))
+                    .append("\">").append(each.getColumnName()).append(",").append("</if>\n");
+            valueItemBuilder.append("\t\t<if test=\"").append(getTestCondition("item", propertyName, each)).append("\">")
+                    .append("#{item.").append(each.getPropertyName()).append("}").append(",").append("</if>\n");
+
+            columnBuilder.append(columnItemBuilder);
+            valueBuilder.append(valueItemBuilder);
+        });
+
+        sqlBuilder.append("insert into ").append(introspectedTable.getFullyQualifiedTableNameAtRuntime()).append("(").append("\n")
+                .append("\t  <trim suffixOverrides=\",\">\n")
+                .append(columnBuilder)
+                .append("\t  </trim>\n")
+                .append("\t)\n")
+                .append("\tvalues").append("\n")
+                .append("\t<foreach collection=\"list\" item=\"item\" separator=\",\">\n")
+                .append("\t(\n")
+                .append("\t  <trim suffixOverrides=\",\">\n")
+                .append(valueBuilder)
+                .append("\t  </trim>\n")
+                .append("\t)\n")
+                .append("\t</foreach>");
+
+        TextElement batchInsertTextElement = new TextElement(sqlBuilder.toString());
+        XmlElement batchInsert = new XmlElement("insert");
+        batchInsert.addAttribute(new Attribute("id", "batchInsert"));
+        batchInsert.addAttribute(new Attribute("useGeneratedKeys", "true"));
+        batchInsert.addAttribute(new Attribute("keyProperty", introspectedTable.getPrimaryKeyColumns().get(0).getJavaProperty()));
+        batchInsert.addElement(batchInsertTextElement);
+        parentElement.addElement(batchInsert);
     }
 
+    private String getTestCondition(String prefix, String propertyName, EntityProperty entityProperty) {
+        String testCondition = prefix + "." + propertyName + " != null";
+        if (entityProperty.getJavaShortPropertyType().equalsIgnoreCase("string")) {
+            testCondition += " and " + prefix + "." + propertyName + " != ''";
+        }
+        return testCondition;
+    }
+
+    /**
+     * 自动生成表的基础字段
+     */
     private void addBaseSelectFields(XmlElement parentElement) {
         XmlElement sql = new XmlElement("sql");
         sql.addAttribute(new Attribute("id", "baseSelectFields"));

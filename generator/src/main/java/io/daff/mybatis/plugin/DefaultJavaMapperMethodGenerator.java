@@ -21,9 +21,7 @@ public class DefaultJavaMapperMethodGenerator extends AbstractJavaMapperMethodGe
         // resetInterface(interfaze);
 
         addInterfaceBatchInsert(interfaze);
-        addInterfaceDelete(interfaze);
         addInterfaceDeleteByIds(interfaze);
-        addInterfaceBatchUpdateById(interfaze);
         addInterfaceSelect(interfaze);
         addInterfaceSelectByIds(interfaze);
     }
