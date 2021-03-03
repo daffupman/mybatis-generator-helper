@@ -24,6 +24,7 @@ public class DefaultJavaMapperMethodGenerator extends AbstractJavaMapperMethodGe
         addInterfaceDeleteByIds(interfaze);
         addInterfaceSelect(interfaze);
         addInterfaceSelectByIds(interfaze);
+        addInterfaceBatchUpdate(interfaze);
     }
 
     private void addInterfaceSelectByIds(Interface interfaze) {
@@ -65,12 +66,13 @@ public class DefaultJavaMapperMethodGenerator extends AbstractJavaMapperMethodGe
         }
     }
 
-    private void addInterfaceBatchUpdateById(Interface interfaze) {
+    private void addInterfaceBatchUpdate(Interface interfaze) {
         Method method = new Method();
         method.setVisibility(JavaVisibility.DEFAULT);
         method.setReturnType(FullyQualifiedJavaType.getIntInstance());
-        method.setName("batchUpdateById");
-        FullyQualifiedJavaType paramType = new FullyQualifiedJavaType(introspectedTable.getBaseRecordType());
+        method.setName("batchUpdate");
+        FullyQualifiedJavaType paramType = FullyQualifiedJavaType.getNewListInstance();
+        paramType.addTypeArgument(new FullyQualifiedJavaType(introspectedTable.getBaseRecordType()));
         method.addParameter(new Parameter(paramType, "records"));
 
         context.getCommentGenerator().addGeneralMethodComment(method, introspectedTable);

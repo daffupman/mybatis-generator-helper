@@ -26,6 +26,7 @@ public class DefaultXmlElementGenerator extends AbstractXmlElementGenerator {
         addDeleteByIdsXmlElement(parentElement);
         addSelectXmlElement(parentElement);
         addSelectByIds(parentElement);
+        addBatchUpdateXmlElement(parentElement);
     }
 
     /**
@@ -108,7 +109,7 @@ public class DefaultXmlElementGenerator extends AbstractXmlElementGenerator {
     }
 
     /**
-     * 自动生成批量更新的功能
+     * 自动生成批量新增的功能
      */
     private void addBatchInsertXmlElement(XmlElement parentElement) {
         StringBuilder sqlBuilder = new StringBuilder();
@@ -123,9 +124,9 @@ public class DefaultXmlElementGenerator extends AbstractXmlElementGenerator {
             StringBuilder columnItemBuilder = new StringBuilder(128);
             StringBuilder valueItemBuilder = new StringBuilder(128);
             String propertyName = each.getPropertyName();
-            columnItemBuilder.append("\t\t<if test=\"").append(getTestCondition("collection[0]", propertyName, each))
+            columnItemBuilder.append("\t\t<if test=\"").append(getTestCondition("collection[0]", propertyName))
                     .append("\">").append(each.getColumnName()).append(",").append("</if>\n");
-            valueItemBuilder.append("\t\t<if test=\"").append(getTestCondition("item", propertyName, each)).append("\">")
+            valueItemBuilder.append("\t\t<if test=\"").append(getTestCondition("item", propertyName)).append("\">")
                     .append("#{item.").append(each.getPropertyName()).append("}").append(",").append("</if>\n");
 
             columnBuilder.append(columnItemBuilder);
@@ -155,12 +156,45 @@ public class DefaultXmlElementGenerator extends AbstractXmlElementGenerator {
         parentElement.addElement(batchInsert);
     }
 
-    private String getTestCondition(String prefix, String propertyName, EntityProperty entityProperty) {
-        String testCondition = prefix + "." + propertyName + " != null";
-        if (entityProperty.getJavaShortPropertyType().equalsIgnoreCase("string")) {
-            testCondition += " and " + prefix + "." + propertyName + " != ''";
-        }
-        return testCondition;
+    /**
+     * 自动生成批量新增的功能
+     */
+    private void addBatchUpdateXmlElement(XmlElement parentElement) {
+        StringBuilder sqlBuilder = new StringBuilder();
+
+        StringBuilder setClauseBuilder = new StringBuilder(128);
+        List<EntityProperty> javaEntityPropertyList = introspectedTable.getBaseColumns().stream()
+                .map(each -> new EntityProperty(each.getJavaProperty(), each.getFullyQualifiedJavaType().getShortName(), each.getActualColumnName()))
+                .collect(Collectors.toList());
+
+        javaEntityPropertyList.forEach(each -> {
+            StringBuilder columnItemBuilder = new StringBuilder(128);
+            String propertyName = each.getPropertyName();
+            columnItemBuilder.append("\t    <if test=\"").append(getTestCondition("collection[0]", propertyName)).append("\">")
+                    .append(each.getColumnName()).append(" = ").append("#{item.").append(each.getPropertyName()).append("}").append(",")
+                    .append("</if>\n");
+
+            setClauseBuilder.append(columnItemBuilder);
+        });
+
+        sqlBuilder.append("<foreach collection=\"list\" item=\"item\" separator=\",\">\n")
+                .append("\t\t\tupdate ").append(introspectedTable.getFullyQualifiedTableNameAtRuntime()).append("\n")
+                .append("\t\t\tset\n")
+                .append("\t\t\t<trim suffixOverrides=\",\">\n")
+                .append(setClauseBuilder)
+                .append("\t\t\t</trim>\n")
+                .append("\t\t\twhere ").append(introspectedTable.getPrimaryKeyColumns().get(0).getActualColumnName()).append(" = ").append("#{item.").append(introspectedTable.getPrimaryKeyColumns().get(0).getJavaProperty()).append("}").append("\n")
+                .append("\t\t</foreach>");
+
+        TextElement batchUpdateTextElement = new TextElement(sqlBuilder.toString());
+        XmlElement batchUpdate = new XmlElement("update");
+        batchUpdate.addAttribute(new Attribute("id", "batchUpdate"));
+        batchUpdate.addElement(batchUpdateTextElement);
+        parentElement.addElement(batchUpdate);
+    }
+
+    private String getTestCondition(String prefix, String propertyName) {
+        return prefix + "." + propertyName + " != null";
     }
 
     /**

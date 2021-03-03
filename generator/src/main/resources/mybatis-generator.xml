@@ -44,7 +44,7 @@
             请修改成为你自己的内容
          -->
         <jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
-                        connectionURL="jdbc:mysql://192.168.35.40:3306/acs?characterEncoding=utf8&amp;useSSL=false"
+                        connectionURL="jdbc:mysql://192.168.65.30:3306/notes?characterEncoding=utf8&amp;useSSL=false"
                         userId="root"
                         password="root">
         </jdbcConnection>
@@ -63,7 +63,7 @@
             targetPackage 属性设置生成的类的包名
             targetProject 属性设置生成的工程的路径    一般生成为当前工程。写为 .\
          -->
-        <javaModelGenerator targetPackage="io.daff.acs.entity.po" targetProject=".\generator\src\main\java">
+        <javaModelGenerator targetPackage="io.daff.notes.entity.po" targetProject=".\generator\src\main\java">
             <property name="enableSubPackages" value="true" />
             <property name="trimStrings" value="true" />
             <!-- 指定基类：指定基类时，需要在table表中打开需要忽略的列名 -->
@@ -83,7 +83,7 @@
             targetPackage 属性设置生成的mybatis的调用代码，比如mapper之类的接口
             targetProject 属性设置生成的工程的路径    一般生成为当前工程。写为 .\
          -->
-        <javaClientGenerator type="XMLMAPPER" targetPackage="io.daff.acs.mapper"
+        <javaClientGenerator type="XMLMAPPER" targetPackage="io.daff.notes.mapper"
                              targetProject=".\generator\src\main\java">
             <property name="enableSubPackages" value="true" />
         </javaClientGenerator>
@@ -104,6 +104,6 @@
 <!--        <table tableName="role" domainObjectName="Role"/>-->
 <!--        <table tableName="user_things" domainObjectName="UserThings"/>-->
 <!--        <table tableName="role_permission_mapping" domainObjectName="RolePermissionMapping"/>-->
-        <table tableName="hierarchy" domainObjectName="Hierarchy"/>
+        <table tableName="note" domainObjectName="Note"/>
     </context>
 </generatorConfiguration>
