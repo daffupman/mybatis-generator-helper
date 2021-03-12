@@ -1,5 +1,6 @@
 package io.daff.mybatis.plugin;
 
+import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.dom.xml.Attribute;
 import org.mybatis.generator.api.dom.xml.Element;
 import org.mybatis.generator.api.dom.xml.TextElement;
@@ -7,6 +8,7 @@ import org.mybatis.generator.api.dom.xml.XmlElement;
 import org.mybatis.generator.codegen.mybatis3.MyBatis3FormattingUtilities;
 import org.mybatis.generator.codegen.mybatis3.xmlmapper.elements.AbstractXmlElementGenerator;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -116,7 +118,7 @@ public class DefaultXmlElementGenerator extends AbstractXmlElementGenerator {
 
         StringBuilder columnBuilder = new StringBuilder(128);
         StringBuilder valueBuilder = new StringBuilder(512);
-        List<EntityProperty> javaEntityPropertyList = introspectedTable.getBaseColumns().stream()
+        List<EntityProperty> javaEntityPropertyList = introspectedTable.getAllColumns().stream()
                 .map(each -> new EntityProperty(each.getJavaProperty(), each.getFullyQualifiedJavaType().getShortName(), each.getActualColumnName()))
                 .collect(Collectors.toList());
 
@@ -163,7 +165,9 @@ public class DefaultXmlElementGenerator extends AbstractXmlElementGenerator {
         StringBuilder sqlBuilder = new StringBuilder();
 
         StringBuilder setClauseBuilder = new StringBuilder(128);
-        List<EntityProperty> javaEntityPropertyList = introspectedTable.getBaseColumns().stream()
+        List<IntrospectedColumn> baseColumns = introspectedTable.getBaseColumns();
+        baseColumns.addAll(introspectedTable.getBLOBColumns());
+        List<EntityProperty> javaEntityPropertyList = baseColumns.stream()
                 .map(each -> new EntityProperty(each.getJavaProperty(), each.getFullyQualifiedJavaType().getShortName(), each.getActualColumnName()))
                 .collect(Collectors.toList());
 

@@ -22,7 +22,7 @@
         <!-- swagger插件 -->
 <!--        <plugin type="io.daff.mybatis.plugin.SwaggerPlugin"/>-->
         <!-- 整合序列化插件 -->
-        <plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>
+<!--        <plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>-->
         <!-- 类注释插件 -->
         <plugin type="io.daff.mybatis.plugin.CommentPlugin"/>
         <plugin type="io.daff.mybatis.plugin.DefaultMapperPlugin"/>
@@ -104,6 +104,7 @@
 <!--        <table tableName="role" domainObjectName="Role"/>-->
 <!--        <table tableName="user_things" domainObjectName="UserThings"/>-->
 <!--        <table tableName="role_permission_mapping" domainObjectName="RolePermissionMapping"/>-->
-        <table tableName="note" domainObjectName="Note"/>
+<!--        <table tableName="note" domainObjectName="Note"/>-->
+        <table tableName="content" domainObjectName="Content"/>
     </context>
 </generatorConfiguration>
