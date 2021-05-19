@@ -1,6 +1,5 @@
 package io.daff.base.entity;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
@@ -12,6 +11,5 @@ import lombok.Data;
 @Data
 public class BaseEntity {
 
-    @ApiModelProperty("主键id")
     private Integer id;
 }
