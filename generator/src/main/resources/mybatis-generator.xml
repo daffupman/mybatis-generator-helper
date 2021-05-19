@@ -74,7 +74,7 @@
             targetPackage 属性设置生成的sql配置文件的包名
             targetProject 属性设置生成的工程的路径    一般生成为当前工程。写为 .\
          -->
-        <sqlMapGenerator targetPackage="mapper"  targetProject=".//generator//src//main//resources">
+        <sqlMapGenerator targetPackage="mapper"  targetProject="./generator/src/main/resources">
             <property name="enableSubPackages" value="true" />
         </sqlMapGenerator>
 
@@ -84,7 +84,7 @@
             targetProject 属性设置生成的工程的路径    一般生成为当前工程。写为 .\
          -->
         <javaClientGenerator type="XMLMAPPER" targetPackage="io.daff.uacs.service.mapper"
-                             targetProject=".//generator//src//main//java">
+                             targetProject="./generator/src/main/java">
             <property name="enableSubPackages" value="true" />
         </javaClientGenerator>
 
