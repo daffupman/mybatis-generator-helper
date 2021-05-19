@@ -9,6 +9,7 @@ import org.mybatis.generator.codegen.mybatis3.MyBatis3FormattingUtilities;
 import org.mybatis.generator.codegen.mybatis3.xmlmapper.elements.AbstractXmlElementGenerator;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +22,7 @@ public class DefaultXmlElementGenerator extends AbstractXmlElementGenerator {
     @Override
     public void addElements(XmlElement parentElement) {
 
-        // resetOriginXmlElement(parentElement);
+        resetOriginXmlElement(parentElement);
 
         addBaseSelectFields(parentElement);
         addBatchInsertXmlElement(parentElement);
@@ -37,8 +38,8 @@ public class DefaultXmlElementGenerator extends AbstractXmlElementGenerator {
     private void addSelectByIds(XmlElement parentElement) {
 
         String sqlBuilder = "select\t" + "<include refid=\"baseSelectFields\"/>" + "\r\n" +
-                "\tfrom " + introspectedTable.getFullyQualifiedTableNameAtRuntime() + "\r\n" +
-                "\twhere " + introspectedTable.getPrimaryKeyColumns().get(0).getActualColumnName() + "\r\n" +
+                "\t\tfrom " + introspectedTable.getFullyQualifiedTableNameAtRuntime() + "\r\n" +
+                "\t\twhere `" + introspectedTable.getPrimaryKeyColumns().get(0).getActualColumnName() + "`\r\n" +
                 "\t\t<foreach collection=\"collection\" item=\"item\" open=\"in (\" close=\")\" separator=\",\">\r\n" +
                 "\t\t\t" + "#{item}" + "\r\n" +
                 "\t\t</foreach>";
@@ -70,20 +71,20 @@ public class DefaultXmlElementGenerator extends AbstractXmlElementGenerator {
             if (each.getJavaShortPropertyType().equalsIgnoreCase("string")) {
                 testCondition += " and " + propertyName + " != ''";
             }
-            ifItemBuilder.append("\t\t<if test=\"").append(testCondition).append("\">\n")
-                    .append("\t\t  ").append(each.getColumnName()).append(" = ").append("#{").append(each.getPropertyName()).append("}").append("\n")
-                    .append("\t\t</if>\n");
+            ifItemBuilder.append("\t\t\t\t<if test=\"").append(testCondition).append("\">")
+                    .append("`").append(each.getColumnName()).append("` = ").append("#{").append(each.getPropertyName()).append("}")
+                    .append("</if>\n");
 
             ifBuilder.append(ifItemBuilder);
         });
 
         sqlBuilder.append("select ").append("<include refid=\"baseSelectFields\"/>").append("\r\n")
-                .append("\tfrom ").append(introspectedTable.getFullyQualifiedTableNameAtRuntime()).append("\r\n")
-                .append("\t<where>\n")
-                .append("\t  <trim suffixOverrides=\",\">\n")
+                .append("\t  from ").append(introspectedTable.getFullyQualifiedTableNameAtRuntime()).append("\r\n")
+                .append("\t  <where>\n")
+                .append("\t    <trim suffixOverrides=\",\">\n")
                 .append(ifBuilder)
-                .append("\t  </trim>\n")
-                .append("\t</where>");
+                .append("\t    </trim>\n")
+                .append("\t  </where>");
         TextElement selectByIdsTextElement = new TextElement(sqlBuilder.toString());
 
         XmlElement select = new XmlElement("select");
@@ -98,7 +99,7 @@ public class DefaultXmlElementGenerator extends AbstractXmlElementGenerator {
      */
     private void addDeleteByIdsXmlElement(XmlElement parentElement) {
         String sqlBuilder = "delete from " + introspectedTable.getFullyQualifiedTableNameAtRuntime() + "\r\n" +
-                "\twhere " + introspectedTable.getPrimaryKeyColumns().get(0).getActualColumnName() + "\r\n" +
+                "\t  where `" + introspectedTable.getPrimaryKeyColumns().get(0).getActualColumnName() + "`\r\n" +
                 "\t  <foreach collection=\"collection\" item=\"item\" open=\"in (\" close=\")\" separator=\",\">\r\n" +
                 "\t\t" + "#{item}" + "\r\n" +
                 "\t  </foreach>";
@@ -126,9 +127,9 @@ public class DefaultXmlElementGenerator extends AbstractXmlElementGenerator {
             StringBuilder columnItemBuilder = new StringBuilder(128);
             StringBuilder valueItemBuilder = new StringBuilder(128);
             String propertyName = each.getPropertyName();
-            columnItemBuilder.append("\t\t<if test=\"").append(getTestCondition("collection[0]", propertyName))
-                    .append("\">").append(each.getColumnName()).append(",").append("</if>\n");
-            valueItemBuilder.append("\t\t<if test=\"").append(getTestCondition("item", propertyName)).append("\">")
+            columnItemBuilder.append("\t\t\t<if test=\"").append(getTestCondition("collection[0]", propertyName))
+                    .append("\">").append("`").append(each.getColumnName()).append("`").append(",").append("</if>\n");
+            valueItemBuilder.append("\t\t\t<if test=\"").append(getTestCondition("item", propertyName)).append("\">")
                     .append("#{item.").append(each.getPropertyName()).append("}").append(",").append("</if>\n");
 
             columnBuilder.append(columnItemBuilder);
@@ -139,15 +140,15 @@ public class DefaultXmlElementGenerator extends AbstractXmlElementGenerator {
                 .append("\t  <trim suffixOverrides=\",\">\n")
                 .append(columnBuilder)
                 .append("\t  </trim>\n")
-                .append("\t)\n")
-                .append("\tvalues").append("\n")
-                .append("\t<foreach collection=\"list\" item=\"item\" separator=\",\">\n")
-                .append("\t(\n")
-                .append("\t  <trim suffixOverrides=\",\">\n")
+                .append("\t\t)\n")
+                .append("\t\tvalues").append("\n")
+                .append("\t\t<foreach collection=\"list\" item=\"item\" separator=\",\">\n")
+                .append("\t\t(\n")
+                .append("\t\t<trim suffixOverrides=\",\">\n")
                 .append(valueBuilder)
-                .append("\t  </trim>\n")
-                .append("\t)\n")
-                .append("\t</foreach>");
+                .append("\t\t</trim>\n")
+                .append("\t\t)\n")
+                .append("\t\t</foreach>");
 
         TextElement batchInsertTextElement = new TextElement(sqlBuilder.toString());
         XmlElement batchInsert = new XmlElement("insert");
@@ -174,8 +175,8 @@ public class DefaultXmlElementGenerator extends AbstractXmlElementGenerator {
         javaEntityPropertyList.forEach(each -> {
             StringBuilder columnItemBuilder = new StringBuilder(128);
             String propertyName = each.getPropertyName();
-            columnItemBuilder.append("\t    <if test=\"").append(getTestCondition("collection[0]", propertyName)).append("\">")
-                    .append(each.getColumnName()).append(" = ").append("#{item.").append(each.getPropertyName()).append("}").append(",")
+            columnItemBuilder.append("\t\t\t\t<if test=\"").append(getTestCondition("collection[0]", propertyName)).append("\">")
+                    .append("`").append(each.getColumnName()).append("`").append(" = ").append("#{item.").append(each.getPropertyName()).append("}").append(",")
                     .append("</if>\n");
 
             setClauseBuilder.append(columnItemBuilder);
@@ -187,7 +188,7 @@ public class DefaultXmlElementGenerator extends AbstractXmlElementGenerator {
                 .append("\t\t\t<trim suffixOverrides=\",\">\n")
                 .append(setClauseBuilder)
                 .append("\t\t\t</trim>\n")
-                .append("\t\t\twhere ").append(introspectedTable.getPrimaryKeyColumns().get(0).getActualColumnName()).append(" = ").append("#{item.").append(introspectedTable.getPrimaryKeyColumns().get(0).getJavaProperty()).append("}").append("\n")
+                .append("\t\t\twhere `").append(introspectedTable.getPrimaryKeyColumns().get(0).getActualColumnName()).append("` = ").append("#{item.").append(introspectedTable.getPrimaryKeyColumns().get(0).getJavaProperty()).append("}").append("\n")
                 .append("\t\t</foreach>");
 
         TextElement batchUpdateTextElement = new TextElement(sqlBuilder.toString());
@@ -208,28 +209,14 @@ public class DefaultXmlElementGenerator extends AbstractXmlElementGenerator {
         XmlElement sql = new XmlElement("sql");
         sql.addAttribute(new Attribute("id", "baseSelectFields"));
         String baseSelectFields = introspectedTable.getAllColumns().stream()
-                .map(MyBatis3FormattingUtilities::getEscapedColumnName).collect(Collectors.joining(", "));
+                .map(introspectedColumn -> "`" + MyBatis3FormattingUtilities.getEscapedColumnName(introspectedColumn) + "`")
+                .collect(Collectors.joining(", "));
         sql.addElement(new TextElement(baseSelectFields));
         parentElement.addElement(sql);
     }
 
     private void resetOriginXmlElement(XmlElement parentElement) {
-        for (Element element : parentElement.getElements()) {
-            for (Attribute attribute : ((XmlElement) element).getAttributes()) {
-                if (attribute.getName().equalsIgnoreCase("id")
-                        && attribute.getValue().equalsIgnoreCase("deleteByPrimaryKey")) {
-                    ((XmlElement) element).addAttribute(new Attribute("id", "deleteById"));
-                }
-                if (attribute.getName().equalsIgnoreCase("id")
-                        && attribute.getValue().equalsIgnoreCase("updateByPrimaryKey")) {
-                    ((XmlElement) element).addAttribute(new Attribute("id", "updateById"));
-                }
-                if (attribute.getName().equalsIgnoreCase("id")
-                        && attribute.getValue().equalsIgnoreCase("selectByPrimaryKey")) {
-                    ((XmlElement) element).addAttribute(new Attribute("id", "selectById"));
-                }
-            }
-        }
+        parentElement.getElements().removeIf(nextElement -> !((XmlElement) nextElement).getName().equals("resultMap"));
     }
 
     private XmlElement getIncludeElement() {

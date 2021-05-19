@@ -8,6 +8,7 @@ import org.mybatis.generator.api.dom.java.Method;
 import org.mybatis.generator.api.dom.java.Parameter;
 import org.mybatis.generator.codegen.mybatis3.javamapper.elements.AbstractJavaMapperMethodGenerator;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -18,7 +19,7 @@ public class DefaultJavaMapperMethodGenerator extends AbstractJavaMapperMethodGe
     @Override
     public void addInterfaceElements(Interface interfaze) {
 
-        // resetInterface(interfaze);
+        resetInterface(interfaze);
 
         addInterfaceBatchInsert(interfaze);
         addInterfaceDeleteByIds(interfaze);
@@ -135,17 +136,10 @@ public class DefaultJavaMapperMethodGenerator extends AbstractJavaMapperMethodGe
      * 重命名默认生成的mapper方法名称
      */
     private void resetInterface(Interface interfaze) {
-        interfaze.getMethods().forEach(method -> {
-            method.setVisibility(JavaVisibility.DEFAULT);
-            if (method.getName().equalsIgnoreCase("deleteByPrimaryKey")) {
-                method.setName("deleteById");
-            }
-            if (method.getName().equalsIgnoreCase("selectByPrimaryKey")) {
-                method.setName("selectById");
-            }
-            if (method.getName().equalsIgnoreCase("updateByPrimaryKey")) {
-                method.setName("updateById");
-            }
-        });
+        Iterator<Method> iterator = interfaze.getMethods().iterator();
+        while (iterator.hasNext()) {
+            iterator.next();
+            iterator.remove();
+        }
     }
 }
