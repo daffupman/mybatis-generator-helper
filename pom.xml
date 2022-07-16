@@ -9,7 +9,7 @@
     <version>0.0.2</version>
     <modules>
         <module>generator</module>
-        <module>base-model</module>
+        <module>common</module>
     </modules>
     <packaging>pom</packaging>
 

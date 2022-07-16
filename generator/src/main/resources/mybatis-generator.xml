@@ -18,14 +18,14 @@
         <property name="endingDelimiter" value="`"/>
 
         <!-- 整合lombok插件 -->
-        <plugin type="io.daff.mybatis.plugin.LombokPlugin"/>
+        <plugin type="io.daff.generator.plugin.LombokPlugin"/>
         <!-- swagger插件 -->
-<!--        <plugin type="io.daff.mybatis.plugin.SwaggerPlugin"/>-->
+<!--        <plugin type="io.daff.generator.plugin.SwaggerPlugin"/>-->
         <!-- 整合序列化插件 -->
-        <plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>
+<!--        <plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>-->
         <!-- 类注释插件 -->
-        <plugin type="io.daff.mybatis.plugin.CommentPlugin"/>
-        <plugin type="io.daff.mybatis.plugin.DefaultMapperPlugin"/>
+        <plugin type="io.daff.generator.plugin.CommentPlugin"/>
+        <plugin type="io.daff.generator.plugin.MapperInterfaceMethodRenamePlugin"/>
         <!--生成mapper.xml时覆盖原文件-->
         <plugin type="org.mybatis.generator.plugins.UnmergeableXmlMappersPlugin" />
         <!-- 通用mapper插件 -->
@@ -39,9 +39,9 @@
 <!--            <property name="endingDelimiter" value="`"/>-->
 <!--        </plugin>-->
         <!-- 自动生成service层代码插件 -->
-        <plugin type="io.daff.mybatis.plugin.ServicePlugin"/>
+<!--        <plugin type="io.daff.generator.plugin.ServicePlugin"/>-->
         <!-- 自动生成controller层代码插件 -->
-        <plugin type="io.daff.mybatis.plugin.ControllerPlugin"/>
+<!--        <plugin type="io.daff.generator.plugin.ControllerPlugin"/>-->
 
         <!-- 去掉全部的注释 -->
         <commentGenerator>
@@ -54,7 +54,7 @@
             请修改成为你自己的内容
          -->
         <jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
-                        connectionURL="jdbc:mysql://192.168.35.40:3306/acs?characterEncoding=utf8&amp;useSSL=false"
+                        connectionURL="jdbc:mysql://127.0.0.1:3306/memberrating?characterEncoding=utf8&amp;useSSL=false"
                         userId="root"
                         password="root">
         </jdbcConnection>
@@ -73,7 +73,7 @@
             targetPackage 属性设置生成的类的包名
             targetProject 属性设置生成的工程的路径    一般生成为当前工程。写为 .\
          -->
-        <javaModelGenerator targetPackage="io.daff.acs.entity.po" targetProject=".\generator\src\main\java">
+        <javaModelGenerator targetPackage="io.daff.memberrating.entity.po" targetProject="./generator/src/main/java">
             <property name="enableSubPackages" value="true" />
             <property name="trimStrings" value="true" />
             <!-- 指定基类：指定基类时，需要在table表中打开需要忽略的列名 -->
@@ -84,7 +84,7 @@
             targetPackage 属性设置生成的sql配置文件的包名
             targetProject 属性设置生成的工程的路径    一般生成为当前工程。写为 .\
          -->
-        <sqlMapGenerator targetPackage="mapper"  targetProject=".\generator\src\main\resources">
+        <sqlMapGenerator targetPackage="mapper"  targetProject="./generator/src/main/resources">
             <property name="enableSubPackages" value="true" />
         </sqlMapGenerator>
 
@@ -93,8 +93,8 @@
             targetPackage 属性设置生成的mybatis的调用代码，比如mapper之类的接口
             targetProject 属性设置生成的工程的路径    一般生成为当前工程。写为 .\
          -->
-        <javaClientGenerator type="XMLMAPPER" targetPackage="io.daff.acs.mapper"
-                             targetProject=".\generator\src\main\java">
+        <javaClientGenerator type="XMLMAPPER" targetPackage="io.daff.memberrating.mapper"
+                             targetProject="./generator/src/main/java">
             <property name="enableSubPackages" value="true" />
         </javaClientGenerator>
 
@@ -109,14 +109,14 @@
 <!--            <ignoreColumn column="id"/>-->
 <!--        </table>-->
 <!--        <table tableName="%"/>-->
-<!--        <table tableName="permission" domainObjectName="Permission"/>-->
+        <table tableName="level" domainObjectName="Level"/>
 <!--        <table tableName="notice" domainObjectName="Notice"/>-->
 <!--        <table tableName="role" domainObjectName="Role"/>-->
 <!--        <table tableName="user_things" domainObjectName="UserThings"/>-->
 <!--        <table tableName="role_permission_mapping" domainObjectName="RolePermissionMapping"/>-->
-        <table tableName="operation_log" domainObjectName="OperationLog">
-            <columnOverride column="old_value" javaType="java.lang.String" jdbcType="VARCHAR" />
-            <columnOverride column="new_value" javaType="java.lang.String" jdbcType="VARCHAR" />
-        </table>
+<!--        <table tableName="operation_log" domainObjectName="OperationLog">-->
+<!--            <columnOverride column="old_value" javaType="java.lang.String" jdbcType="VARCHAR" />-->
+<!--            <columnOverride column="new_value" javaType="java.lang.String" jdbcType="VARCHAR" />-->
+<!--        </table>-->
     </context>
 </generatorConfiguration>

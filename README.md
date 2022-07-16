@@ -1,5 +1,5 @@
 # mybatis-generator-helper(mybatis逆向工程助手)
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/daffupman/mybatis-generator-helper)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/daff/mybatis-generator-helper)
 
 ## 简介
 
